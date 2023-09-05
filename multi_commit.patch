@@ -1,0 +1,238 @@
+From 00023ed27ce0b2eb37092849948982ff98193a8d Mon Sep 17 00:00:00 2001
+From: Dhruvansu Thakkar <dhruvanshuthakkar@gmail.com>
+Date: Mon, 4 Sep 2023 15:42:22 -0400
+Subject: [PATCH 1/3] FIX: update getDataPoint and getRatio method in
+ client2.py file
+
+---
+ __pycache__/client3.cpython-310.pyc | Bin 0 -> 1051 bytes
+ client3.py                          |  10 +++++++---
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+ create mode 100644 __pycache__/client3.cpython-310.pyc
+
+diff --git a/__pycache__/client3.cpython-310.pyc b/__pycache__/client3.cpython-310.pyc
+new file mode 100644
+index 0000000000000000000000000000000000000000..017aa83fc2d0e21e77e6e4a84c8112b9001af9e8
+GIT binary patch
+literal 1051
+zcmYjQO>Y}F5GA=>?aE(u5=Dt`tbw3WQN<~WAc4@20C5{2Km#X13zTrNpv95A_G&3}
+zsTNV?llnvCWA6Did+jOrB8Q$j<l06kaOMqncJ|FY%4}|~5nO}&AN78lkbive>B2Me
+z6nFI=jV78FL^hsE8e%3R%_P^6j5XKs-$b@_ODE_PNOgM3?61&<HHepVN%zU`kK{U#
+z)doZ-o2xD0tIvS0=moi;7j(7ly}Z#Ta04?t@+P$4=8_(Ac}sTWZP|r8x(&CW1Gk|&
+z;$5<&l$<@r(=|w-3*9BVJloau4YGYhdg~vMIe9t%{MfnaU~jK5LscA`$_<`8eDZMb
+zYzFr254ryCuk-w0O2`oR^@<U3+|O`V12k>2z^XgsoH~!#4$;vLvN&fU=GSqwVCQ^6
+z7i<wN_=qEqc>Y)%Sfgh{5UMDII|fk#Xwc#hRm`9g&WJITV3orRp_Nlplb24^aplbL
+zv`(CvW=FZM<EhPu(8Q`b?a?|O6-K#UT*qfK<G?cHTDLJbYf{^o)<Em~c}J|5{l7<g
+zaQNb&|Ff}URf?aCRbx0D1=l~BPKN#JPv|>*xBvCwu*jiw-#nPUtvANt_L1H}pofL3
+z4K$3UbQ^!1ZcytFhMvXM^4O0yjIxEG-N?h{yW%-GfnDcDn2`vCGbL21FY%H1;NJ|C
+zdrT&m8CT#aJZQ{1=G7_Ed+p18iBaYIWsFn16`p0;MCE0c&A)i%C#A)`N+>7p<E#ev
+zs;>k#8+`Z(qTW0WwJ@)DSMrm}l(J=!oSDe2nJtR^=z#^iMU|7SCYJH5Uw(Z3TTNev
+zF<gJRR1?Uun&&7`9b=6#)HJJOlulPNxvG+26*GmhZlMwr<!Ww0>ADq^t!#pA1buDl
+zk^h4RO~b7y-6zBF65D1X-%jx274W^EW3`JW?W8oNJmOIrrE6)j%>-=(?9vY7A36IU
+DL}dm$
+
+literal 0
+HcmV?d00001
+
+diff --git a/client3.py b/client3.py
+index 3fc09b7..135a075 100644
+--- a/client3.py
++++ b/client3.py
+@@ -35,14 +35,16 @@ def getDataPoint(quote):
+     stock = quote['stock']
+     bid_price = float(quote['top_bid']['price'])
+     ask_price = float(quote['top_ask']['price'])
+-    price = bid_price
++    price = (bid_price+ask_price) / 2
+     return stock, bid_price, ask_price, price
+ 
+ 
+ def getRatio(price_a, price_b):
+     """ Get ratio of price_a and price_b """
+     """ ------------- Update this function ------------- """
+-    return 1
++    if(price_b == 0):
++        return
++    return price_a/price_b
+ 
+ 
+ # Main
+@@ -52,8 +54,10 @@ if __name__ == "__main__":
+         quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
+ 
+         """ ----------- Update to get the ratio --------------- """
++        prices = {}
+         for quote in quotes:
+             stock, bid_price, ask_price, price = getDataPoint(quote)
++            prices[stock] = price
+             print("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
+ 
+-        print("Ratio %s" % getRatio(price, price))
++        print("Ratio %s" % getRatio(prices["ABC"], prices["DEF"]))
+-- 
+2.33.0.windows.2
+
+
+From 4b0d65afcb891c8f2b3347def0e9096caaea9cd7 Mon Sep 17 00:00:00 2001
+From: Dhruvansu Thakkar <dhruvanshuthakkar@gmail.com>
+Date: Tue, 5 Sep 2023 10:39:03 -0400
+Subject: [PATCH 2/3] TEST: add test cases in client_test.py file
+
+---
+ __pycache__/client3.cpython-310.pyc | Bin 1051 -> 1127 bytes
+ client_test.py                      |  22 +++++++++++++++++++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/__pycache__/client3.cpython-310.pyc b/__pycache__/client3.cpython-310.pyc
+index 017aa83fc2d0e21e77e6e4a84c8112b9001af9e8..272f5d6c6ae985f1dec7f1e3c0ddf8ddee1fa764 100644
+GIT binary patch
+delta 463
+zcmZ8dJxc>Y5Z&3`#J%JWH71vYD2N2{0}%xaMHG#Sm7rE03JJN11V5siq&uto1z}77
+zga1OXv9L`oh}L3b<E$Tz1Ml%>=CSkGTlJ#6mgl7y)#Ktv_|)^p;Gs9WGFU|iQ<#V$
+zhAnoo-s_aBO%`Nun7TqRf=L{S;aCRQAQ$*S9`l&N>?*@T=wKFe=wrSieHH_->t&jz
+zZ~!x5y2yy#B8&O&ZX$$3W-;yco_Ar>%)xvi5_uLTO6*2P5b;PvvLVTlH0N-Xc;yt<
+z+`|&2%_khKyWoQMXjZq2zp~n*LTLL$4vQd!Gp+|he#j!~N{rqVCgx?OfgF1}ZSHts
+zDot8{lS`_vPO)=P>oi+4)U_26=L#e!^TsP~Uu<kv`eJK)XS!(S#R7PyCic5Q@=7=B
+z*w)ssZ4m8PvOldQQ9nV3%g)c8{})#;T4DDb*KDfxB$3K0pqoMpB~(f|Lwp=KrwlMe
+L@L`n8cgep1U3yj#
+
+delta 386
+zcmZ9HF-yZh6vy-4U7JgqU~SXbL7|imR)^wHgdl>ngM*6-LW2%sUZtQ$)40Vci)*;i
+z$?wol)5%Hk3lvB1Y$qSQAOCyr?*HC>i8tZKu4@}Ag6%~#EZi-a6}!RO1zBWMDTf?}
+z##O&aJ14ZRlo!^hOtl;?c~}p<uo3#S5m{6xj~e8Uxo_kE#?!v4+GLVXevYeJJA!jV
+zXSY)P977<FpjUn28DyBTjE}kMl;kUn<R|pOmYX>0ad04U)Ot6lmt2L`pmLycT2`=@
+zz9?tdF~4;yvE>IgJNj$MA1X@C#Vw_0*XbnQQKu<aK;*K;2H0)NnC*ch-`VLTG4(S&
+zB@r5yhQ2*7JtmWfbm{ot``|u~p6}>TkDs;`geO1%XPgNpY++Wh1&9Kw;Dd*J!SNSp
+CvqaYb
+
+diff --git a/client_test.py b/client_test.py
+index af2bf26..81375bd 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -1,5 +1,5 @@
+ import unittest
+-from client3 import getDataPoint
++from client3 import getDataPoint, getRatio
+ 
+ class ClientTest(unittest.TestCase):
+   def test_getDataPoint_calculatePrice(self):
+@@ -9,6 +9,9 @@ class ClientTest(unittest.TestCase):
+     ]
+     """ ------------ Add the assertion below ------------ """
+ 
++    for quote in quotes:
++      self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
++    
+   def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
+     quotes = [
+       {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
+@@ -16,10 +19,27 @@ class ClientTest(unittest.TestCase):
+     ]
+     """ ------------ Add the assertion below ------------ """
+ 
++    for quote in quotes:
++      self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
+ 
+   """ ------------ Add more unit tests ------------ """
+ 
++  def test_getRatio_calculatePriceZeroForDEFStock(self):
++    quotes = [
++      {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
++      {'top_ask': {'price': 0.0, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 0.0, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
++      # {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
++    ]
++    """ ------------ Add the assertion below ------------ """
+ 
++    prices = {}
++    for quote in quotes:
++      stock, bid_price, ask_price, price = getDataPoint(quote)
++      prices[stock] = price
++    
++    # expect getRation funtion to return None and if None == None then test passes which means price of a stock is 0 and getRation function caught it
++    # to fail this test comment out the DEF stock whose price is zero and uncomment the DEF stock whose prices are correct 
++    self.assertEqual(getRatio(prices['ABC'], prices["DEF"]), None)
+ 
+ if __name__ == '__main__':
+     unittest.main()
+-- 
+2.33.0.windows.2
+
+
+From 412a9be1f8b32ae12de16ee8a78c0563d63f1cf9 Mon Sep 17 00:00:00 2001
+From: Dhruvansu Thakkar <dhruvanshuthakkar@gmail.com>
+Date: Tue, 5 Sep 2023 10:54:13 -0400
+Subject: [PATCH 3/3] FIX(test): add price_a equal to zero check for getRatio
+ method in client.py file and add test cases relating to the check
+
+---
+ __pycache__/client3.cpython-310.pyc | Bin 1127 -> 1135 bytes
+ client3.py                          |   2 +-
+ client_test.py                      |  20 ++++++++++++++++++--
+ 3 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/__pycache__/client3.cpython-310.pyc b/__pycache__/client3.cpython-310.pyc
+index 272f5d6c6ae985f1dec7f1e3c0ddf8ddee1fa764..dde033bad3454c73a480e5da75fe5db6577b18f1 100644
+GIT binary patch
+delta 61
+zcmaFP@t%V>pO=@50SG?Xe@}V1k++*kOb*E7WT;_CVa#SK=B!}^(M8;omob$x3QU$^
+MzQ%ZK@@M7}0Q;a3GXMYp
+
+delta 53
+zcmaFQ@tlJ<pO=@50SL|-eM`Bxk+++PPYlT8WT;_GVa#SKVxPQ@sg#jpvI_Gx#;D1^
+GnM(kDtq!69
+
+diff --git a/client3.py b/client3.py
+index 135a075..07bf7b0 100644
+--- a/client3.py
++++ b/client3.py
+@@ -42,7 +42,7 @@ def getDataPoint(quote):
+ def getRatio(price_a, price_b):
+     """ Get ratio of price_a and price_b """
+     """ ------------- Update this function ------------- """
+-    if(price_b == 0):
++    if(price_a == 0 or price_b == 0):
+         return
+     return price_a/price_b
+ 
+diff --git a/client_test.py b/client_test.py
+index 81375bd..42c2bb5 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -23,8 +23,24 @@ class ClientTest(unittest.TestCase):
+       self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
+ 
+   """ ------------ Add more unit tests ------------ """
++  def test_getRatio_calculatePriceZeroForABCStockPrice_a(self):
++    quotes = [
++      # {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
++      {'top_ask': {'price': 0.0, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 0.0, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
++      {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
++    ]
++    """ ------------ Add the assertion below ------------ """
++
++    prices = {}
++    for quote in quotes:
++      stock, bid_price, ask_price, price = getDataPoint(quote)
++      prices[stock] = price
++    
++    # expect getRatio funtion to return None then the test passes which means price of a stock is 0 and getRatio function caught it
++    # to fail this test comment out the ABC stock whose price is zero and uncomment the ABC stock whose prices are correct 
++    self.assertEqual(getRatio(prices['ABC'], prices["DEF"]), None)
+ 
+-  def test_getRatio_calculatePriceZeroForDEFStock(self):
++  def test_getRatio_calculatePriceZeroForDEFStockPrice_b(self):
+     quotes = [
+       {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
+       {'top_ask': {'price': 0.0, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 0.0, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+@@ -37,7 +53,7 @@ class ClientTest(unittest.TestCase):
+       stock, bid_price, ask_price, price = getDataPoint(quote)
+       prices[stock] = price
+     
+-    # expect getRation funtion to return None and if None == None then test passes which means price of a stock is 0 and getRation function caught it
++    # expect getRatio funtion to return None then the test passes which means price of a stock is 0 and getRatio function caught it
+     # to fail this test comment out the DEF stock whose price is zero and uncomment the DEF stock whose prices are correct 
+     self.assertEqual(getRatio(prices['ABC'], prices["DEF"]), None)
+ 
+-- 
+2.33.0.windows.2
+
